@@ -1,0 +1,98 @@
+/* ==========================================================================
+   Design tokens. Each variable becomes a Tailwind utility, e.g.
+   --color-ink → text-ink / bg-ink / border-ink, --font-display → font-display,
+   --spacing-sidebar → w-sidebar / ml-sidebar. Change the brand here only.
+   ========================================================================== */
+
+@theme {
+  /* Surfaces & text: cool "concrete" neutrals */
+  --color-paper: #eceeec;
+  --color-surface: #fcfcfb;
+  --color-sunken: #e1e4e2;
+  --color-ink: #121516;
+  --color-ink-2: #474d50;
+  --color-ink-3: #7a8084;
+  --color-line: #d3d7d4;
+  --color-line-strong: #b6bcb8;
+
+  /* Dark sidebar / inverted panels */
+  --color-sidebar-text: #b9bcbf;
+  --color-sidebar-muted: #6c7176;
+  --color-sidebar-dim: #5d6166;
+
+  /* Brand accent: "safety yellow", as on job-site signage and power tools.
+     Yellow is a fill colour: put text-on-signal on it, and never use it for text on light backgrounds. */
+  --color-signal: #f4c20d;
+  --color-signal-strong: #8a6800; /* text-safe dark gold (for large text on light backgrounds) */
+  --color-signal-soft: #fdf1c4;
+  --color-on-signal: #121516;
+
+  /* Job status (reserved for status only) */
+  --color-scheduled: #2d5a9e;
+  --color-scheduled-soft: #e2eaf6;
+  --color-progress: #6d4ed6;
+  --color-progress-soft: #ebe5fb;
+  --color-done: #2b6e45;
+  --color-done-soft: #dfeee3;
+  --color-scheduled-bright: #6f8fc4; /* status tones for dark backgrounds */
+  --color-done-bright: #4f9a6d;
+  --color-progress-bright: #9d86ee;
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecea;
+
+  /* Typography (typefaces are loaded in styles/fonts.ts) */
+  --font-sans: var(--font-body-face), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading-face), "Arial Narrow", ui-sans-serif, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+
+  /* Type scale → text-micro … text-hero. Use these instead of arbitrary sizes. */
+  --text-micro: 0.66rem;
+  --text-micro--line-height: 1rem;
+  --text-caption: 0.72rem;
+  --text-caption--line-height: 1rem;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.25rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-title: 1.125rem;
+  --text-title--line-height: 1.5rem;
+  --text-heading: 1.5rem;
+  --text-heading--line-height: 1.2;
+  --text-display: 2.25rem;
+  --text-display--line-height: 1.1;
+  --text-hero: 3rem;
+  --text-hero--line-height: 1;
+
+  --tracking-label: 0.08em;
+  --tracking-heading: -0.005em; /* condensed display face needs little tightening */
+  --tracking-display: -0.015em;
+
+  /* Layout */
+  --spacing-sidebar: 232px;
+  --spacing-sidebar-collapsed: 72px;
+  --spacing-topbar: 56px;
+  --container-content: 1320px;
+
+  /* Depth instead of outlines: cards float on the concrete background, no hairline borders. */
+  --shadow-card: 0 1px 2px rgb(18 21 22 / 0.05), 0 6px 20px -8px rgb(18 21 22 / 0.1);
+  --shadow-pop: 0 1px 0 rgb(18 21 22 / 0.04), 0 8px 24px -8px rgb(18 21 22 / 0.18);
+
+  /* Motion */
+  --animate-live: live 1.6s ease-in-out infinite;
+  --animate-bar-in: bar-in 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes live {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 45%, transparent); }
+    50% { box-shadow: 0 0 0 4px transparent; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes bar-in {
+    from { transform: scaleX(0); opacity: 0; }
+    to { transform: scaleX(1); opacity: 1; }
+  }
+}

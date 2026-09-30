@@ -1,0 +1,18 @@
+/* Entry stylesheet. Tokens live in theme.css; reusable class strings live in styles/classes/*.ts */
+@import "tailwindcss";
+@import "./theme.css";
+
+@layer base {
+  html {
+    @apply bg-paper text-ink antialiased;
+  }
+  body {
+    @apply font-sans text-body;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ink;
+  }
+  ::selection {
+    @apply bg-signal-soft;
+  }
+}
