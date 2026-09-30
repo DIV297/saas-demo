@@ -93,5 +93,6 @@ src/
 
 ## Docs
 
+- [Design decisions](docs/DESIGN_DECISIONS.md): UX, visual language and code structure, and why
 - [Tech stack](docs/TECH_STACK.md): what's used and why
 - [Production & scaling](docs/PRODUCTION.md): how this becomes a production SaaS
