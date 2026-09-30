@@ -8,8 +8,7 @@ export const gridCenter = "grid place-items-center";
 export const grow = "min-w-0 flex-1";
 
 // Page-level containers.
-/** Side gutter: 20px on phones, 32px from tablet up. */
-export const pageContent = "mx-auto max-w-content px-5 pb-24 pt-4 md:px-8 md:pt-5 lg:pb-8";
+export const pageContent = "mx-auto max-w-content px-4 pb-24 pt-4 md:px-8 md:pt-5 lg:pb-8";
 export const sectionGap = "grid gap-4";
 /** Entrance animation for each new page (skipped for users who prefer reduced motion). */
 export const pageEnter = "motion-safe:animate-page-in";
