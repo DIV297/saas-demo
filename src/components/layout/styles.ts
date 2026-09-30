@@ -59,7 +59,7 @@ export const sidebarStyles = {
 
 export const topbarStyles = {
   /** Layering: top bar (z-30) > sticky page header (z-20) > anything inside page content (≤ z-3). */
-  bar: "sticky top-0 z-30 flex h-topbar items-center justify-between bg-paper px-4 md:px-8",
+  bar: "sticky top-0 z-30 flex h-topbar items-center justify-between bg-paper px-5 md:px-8",
   mobileLogo: "lg:hidden",
   date: "hidden items-center gap-2 font-mono text-secondary text-ink-2 lg:flex",
   liveDot: "size-2 rounded-full bg-success ring-3 ring-success-soft",

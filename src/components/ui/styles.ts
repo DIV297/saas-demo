@@ -49,7 +49,7 @@ export const pageHeaderStyles = {
     "mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 lg:sticky lg:top-topbar lg:z-20 lg:-mx-8 lg:h-subheader lg:bg-paper lg:px-8",
   /** Opt-in: also pinned on smaller screens (e.g. calendar controls). */
   sticky:
-    "max-lg:sticky max-lg:top-topbar max-lg:z-20 max-lg:-mx-4 max-lg:bg-paper max-lg:px-4 max-lg:py-2 md:max-lg:-mx-8 md:max-lg:h-subheader md:max-lg:px-8 md:max-lg:py-0",
+    "max-lg:sticky max-lg:top-topbar max-lg:z-20 max-lg:-mx-5 max-lg:bg-paper max-lg:px-5 max-lg:py-2 md:max-lg:-mx-8 md:max-lg:h-subheader md:max-lg:px-8 md:max-lg:py-0",
   heading: "flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1",
   title: pageTitle,
   /** Desktop: "Title · meta" on one line. Phones: meta gets its own line under the title (no dangling "·"). */
