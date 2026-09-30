@@ -94,12 +94,11 @@ export const weekCalendarStyles = {
   techBadge: "grid size-4 place-items-center rounded-sm bg-surface text-ink",
 } as const;
 
+/** ‹ range ›: full width on phones, compact next to the title on wider screens. */
 export const weekNavStyles = {
-  bar: "flex items-center gap-3",
-  nav: appendClass(inlineRow, "gap-2"),
+  nav: "flex w-full items-center justify-between gap-2 md:w-auto",
   arrow: iconButton,
-  range: "min-w-36 text-center font-mono text-secondary",
-  reset: linkAccent,
-  /** Keeps its width so the arrows don't shift, but isn't visible or clickable. */
-  resetHidden: "invisible",
+  range: "min-w-36 flex-1 text-center font-mono text-secondary",
+  /** Sits in the header meta line: "13 this week · This week". */
+  reset: appendClass(linkAccent, "ml-2"),
 } as const;

@@ -35,7 +35,7 @@ export function CustomerTable({ customers }: { customers: Customer[] }) {
               <span className={col.plan}>
                 <span className={appendClass(s.plan.base, s.plan[c.plan])}>{c.plan}</span>
               </span>
-              <p className={s.since}>{formatDate(c.since, { month: "short", year: "numeric" })}</p>
+              <p className={s.since}>{formatDate(c.since, { month: "short", year: true })}</p>
               <ChevronRight size={16} aria-hidden className={s.chevron} />
               <PendingBar />
             </Link>

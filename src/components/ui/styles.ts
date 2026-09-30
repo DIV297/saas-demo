@@ -1,5 +1,6 @@
 /** Styles for the shared UI primitives that aren't generic enough for @/styles/classes. */
 import {
+  alertError,
   appendClass,
   captionText,
   eyebrow,
@@ -51,7 +52,11 @@ export const pageHeaderStyles = {
     "max-lg:sticky max-lg:top-topbar max-lg:z-20 max-lg:-mx-4 max-lg:bg-paper max-lg:px-4 max-lg:py-2 md:max-lg:-mx-8 md:max-lg:h-subheader md:max-lg:px-8 md:max-lg:py-0",
   heading: "flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1",
   title: pageTitle,
-  meta: appendClass(captionText, "before:mr-2 before:text-line-strong before:content-['·']"),
+  /** Desktop: "Title · meta" on one line. Phones: meta gets its own line under the title (no dangling "·"). */
+  meta: appendClass(
+    captionText,
+    "flex items-center sm:before:mr-2 sm:before:text-line-strong sm:before:content-['·'] max-sm:basis-full",
+  ),
   actions: appendClass(flexWrap, "max-md:w-full"),
 } as const;
 
@@ -80,17 +85,25 @@ export const segmentedStyles = {
 
 export const dialogStyles = {
   dialog:
-    "m-auto max-h-[min(760px,calc(100dvh-32px))] w-[min(560px,calc(100vw-32px))] overflow-hidden rounded-2xl bg-surface p-0 text-ink shadow-pop backdrop:bg-ink/45 backdrop:backdrop-blur-[2px] open:flex open:flex-col open:motion-safe:animate-dialog-in",
+    "m-auto max-h-[min(760px,calc(100dvh-32px))] overflow-hidden outline-none rounded-2xl bg-surface p-0 text-ink shadow-pop backdrop:bg-ink/45 backdrop:backdrop-blur-[2px] open:flex open:flex-col open:motion-safe:animate-dialog-in",
+  size: {
+    md: "w-[min(560px,calc(100vw-32px))]",
+    sm: "w-[min(420px,calc(100vw-32px))]",
+  },
   /** Stays put: only the body scrolls. */
   header: "flex shrink-0 items-start justify-between gap-4 px-5 pb-3 pt-5 md:px-6",
   eyebrow,
-  title: appendClass(pageTitle, "md:text-heading"),
+  /** Compact on phones (long job titles wrap otherwise); full heading size from tablet up. */
+  title: appendClass(pageTitle, "gap-2.5 text-title leading-tight md:gap-3 md:text-heading"),
   close: "grid size-8 cursor-pointer place-items-center rounded-lg text-ink-3 transition hover:bg-sunken hover:text-ink",
-  /** Scrolls between the fixed header and the sticky footer. */
-  body: "min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 md:px-6",
-  /** Action bar pinned to the bottom of the body while the content scrolls. */
+  /**
+   * Scrolls between the fixed header and the sticky footer. flex-auto (not flex-1): with a 0% basis,
+   * iOS Safari collapses the body to nothing inside a dialog that has no fixed height.
+   */
+  body: "min-h-0 flex-auto overflow-y-auto overscroll-contain px-5 md:px-6",
+  /** Action bar pinned to the bottom of the body while the content scrolls. On phones buttons share the row equally. */
   footer:
-    "sticky bottom-0 -mx-5 mt-1 flex flex-wrap items-center justify-end gap-2 bg-surface px-5 pb-5 pt-3 shadow-[0_-10px_16px_-14px_rgb(17_19_24/0.25)] md:-mx-6 md:px-6",
+    "sticky bottom-0 -mx-5 mt-1 flex flex-wrap items-center justify-end gap-2 max-sm:[&>button]:flex-1 bg-surface px-5 pb-5 pt-3 shadow-[0_-10px_16px_-14px_rgb(17_19_24/0.25)] md:-mx-6 md:px-6",
 } as const;
 
 /** The brand select (filters, form fields, status pill). Menu is shared; the trigger has two looks. */
@@ -129,6 +142,11 @@ export const dropdownStyles = {
   count: "rounded-full bg-paper px-1.5 font-mono text-secondary text-ink-3",
   check: "grid size-5 shrink-0 place-items-center rounded-full text-on-brand [&:has(svg)]:bg-brand",
   empty: "px-2.5 py-3 text-secondary text-ink-3",
+} as const;
+
+export const confirmDialogStyles = {
+  message: "pb-2 text-primary text-ink-2",
+  error: appendClass(alertError, "mt-3"),
 } as const;
 
 export const selectFieldStyles = {

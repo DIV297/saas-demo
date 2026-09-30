@@ -30,6 +30,11 @@ export const jobsBoardStyles = {
   error: appendClass(alertError, "rounded-none px-4 py-2"),
 } as const;
 
+export const statusTabsStyles = {
+  tabs: "max-md:hidden",
+  dropdown: "md:hidden",
+} as const;
+
 /** Overrides the Dropdown trigger so it looks like the status badge (colours come from statusClasses). */
 export const statusSelectStyles = {
   trigger: "h-7 w-auto gap-1.5 rounded-full border-transparent px-2.5 text-secondary font-semibold hover:border-current/35",
@@ -64,5 +69,4 @@ export const jobDetailsStyles = {
   sub: "block text-secondary text-ink-3",
   footerStart: "mr-auto",
   confirmText: "mr-auto text-secondary text-ink-2",
-  error: alertError,
 } as const;

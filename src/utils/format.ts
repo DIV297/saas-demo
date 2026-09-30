@@ -1,6 +1,6 @@
-import { BUSINESS_TZ } from "./date";
+import { istParts } from "./date";
 
-/** Indian formatting throughout: ₹ with lakh grouping (₹1,85,400), "30 Sept", "9:30 am". */
+/** Indian formatting throughout: ₹ with lakh grouping (₹1,85,400), "30 Sep", "9:30 am". */
 const LOCALE = "en-IN";
 
 const currency = new Intl.NumberFormat(LOCALE, {
@@ -11,17 +11,47 @@ const currency = new Intl.NumberFormat(LOCALE, {
 
 export const formatCurrency = (value: number) => currency.format(value);
 
-export const formatDate = (iso: string | Date, opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" }) =>
-  new Date(iso).toLocaleDateString(LOCALE, { ...opts, timeZone: BUSINESS_TZ });
+/**
+ * Dates and times are spelled out by hand instead of with toLocaleDateString: browsers ship different
+ * locale data (iOS Safari prints "Sep" and "PM", Node prints "Sept" and "pm"), which would make the
+ * same screen look different on each device and break hydration.
+ */
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const short = (name: string) => name.slice(0, 3);
 
-/** "Wed, 30 Sept" */
+interface DateParts {
+  weekday?: "short" | "long";
+  day?: "numeric" | "2-digit";
+  month?: "short" | "long";
+  year?: boolean;
+}
+
+/** IST date with the chosen parts, e.g. { weekday: "short", day: "numeric", month: "short" } → "Wed, 30 Sep". */
+export function formatDate(iso: string | Date, parts: DateParts = { day: "numeric", month: "short" }): string {
+  const p = istParts(new Date(iso));
+  const weekday = parts.weekday && (parts.weekday === "long" ? WEEKDAYS[p.weekday] : short(WEEKDAYS[p.weekday]));
+  const date = [
+    parts.day && (parts.day === "2-digit" ? String(p.day).padStart(2, "0") : p.day),
+    parts.month && (parts.month === "long" ? MONTHS[p.month] : short(MONTHS[p.month])),
+    parts.year && p.year,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return [weekday, date].filter(Boolean).join(", ");
+}
+
+/** "Wed, 30 Sep" */
 export const formatDayShort = (iso: string | Date) => formatDate(iso, { weekday: "short", day: "numeric", month: "short" });
 
 /** "Wednesday, 30 September" */
 export const formatDayLong = (iso: string | Date) => formatDate(iso, { weekday: "long", day: "numeric", month: "long" });
 
-export const formatTime = (iso: string | Date) =>
-  new Date(iso).toLocaleTimeString(LOCALE, { hour: "numeric", minute: "2-digit", timeZone: BUSINESS_TZ });
+/** IST time, e.g. "9:30 am". */
+export const formatTime = (iso: string | Date) => {
+  const { hour, minute } = istParts(new Date(iso));
+  return formatClock(hour, minute);
+};
 
 /** "9:00 am – 10:30 am" */
 export const formatTimeRange = (startIso: string, durationMins: number) =>

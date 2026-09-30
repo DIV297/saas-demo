@@ -7,8 +7,8 @@ interface PageHeaderProps {
   title: string;
   /** Parent pages, e.g. [{ label: "Customers", href: "/customers" }]. Home is always first. */
   parents?: Crumb[];
-  /** One short fact shown after the title, e.g. "10 accounts". */
-  meta?: string;
+  /** One short fact shown after the title, e.g. "10 accounts" (may include a small link). */
+  meta?: ReactNode;
   actions?: ReactNode;
   /** Keep the whole row pinned under the top bar while the page scrolls (e.g. calendar controls). */
   sticky?: boolean;

@@ -1,6 +1,6 @@
 /**
- * Data table. Below the md breakpoint each row becomes a stacked card and every
- * cell shows its column name (from `data-label`) on the left.
+ * Data table. Below the md breakpoint each row becomes a stacked card: every cell shows its
+ * column name (from `data-label`) on the left and its value right-aligned.
  */
 export const table = {
   /** Only phones scroll sideways; on desktop the header row can stay sticky. */
@@ -14,7 +14,7 @@ export const table = {
   row: "transition even:bg-paper/60 hover:bg-brand-soft/40 max-md:block max-md:px-4 max-md:py-2.5",
   cell: [
     "px-4 py-2 align-middle",
-    "max-md:grid max-md:grid-cols-[96px_1fr] max-md:items-center max-md:px-0 max-md:py-1 max-md:*:justify-self-start",
+    "max-md:grid max-md:grid-cols-[auto_1fr] max-md:items-center max-md:gap-x-4 max-md:px-0 max-md:py-1.5 max-md:text-right max-md:*:justify-self-end",
     "max-md:before:row-span-2 max-md:before:font-mono max-md:before:text-secondary max-md:before:uppercase max-md:before:tracking-label max-md:before:text-ink-3 max-md:before:content-[attr(data-label)]",
   ].join(" "),
 } as const;

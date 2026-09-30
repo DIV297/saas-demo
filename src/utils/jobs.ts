@@ -30,6 +30,12 @@ export const isStatusLocked = (status: JobStatus) => STATUS_TRANSITIONS[status].
 
 const canMoveTo = (from: JobStatus, to: JobStatus) => from === to || STATUS_TRANSITIONS[from].includes(to);
 
+/** Status changes that need an "are you sure?": cancelling, and completing (which is final). */
+export type ConfirmableStatus = Extract<JobStatus, "cancelled" | "completed">;
+
+export const needsConfirmation = (status: JobStatus): status is ConfirmableStatus =>
+  status === "cancelled" || status === "completed";
+
 /** Back to Scheduled from another status: needs a new date and time. */
 export const isReschedule = (from: JobStatus, to: JobStatus) => to === "scheduled" && from !== "scheduled";
 

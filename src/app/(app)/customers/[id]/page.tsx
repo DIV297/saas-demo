@@ -16,7 +16,7 @@ export default async function CustomerPage({ params }: PageProps<"/customers/[id
       <PageHeader
         parents={[{ label: "Customers", href: "/customers" }]}
         title={customer.name}
-        meta={`${customer.plan} · since ${formatDate(customer.since, { month: "short", year: "numeric" })}`}
+        meta={`${customer.plan} · since ${formatDate(customer.since, { month: "short", year: true })}`}
       />
 
       <div className={layoutAsideMain}>

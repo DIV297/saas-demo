@@ -1,7 +1,8 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
+import { appendClass } from "@/styles/classes";
 import { dialogStyles as s } from "./styles";
 
 interface DialogProps {
@@ -9,6 +10,8 @@ interface DialogProps {
   onClose: () => void;
   eyebrow?: string;
   title: string;
+  /** "sm" for short confirmations. */
+  size?: keyof typeof s.size;
   children: ReactNode;
 }
 
@@ -16,29 +19,35 @@ interface DialogProps {
  * Modal built on the native <dialog> element: focus trapping, Esc-to-close
  * and the backdrop come from the browser, so there's no extra library.
  */
-export function Dialog({ open, onClose, eyebrow, title, children }: DialogProps) {
+export function Dialog({ open, onClose, eyebrow, title, size = "md", children }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      dialog.focus(); // focus the dialog itself, so the close button doesn't open with a focus ring
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
 
   return (
     <dialog
       ref={ref}
-      className={s.dialog}
-      aria-labelledby="dialog-title"
-      onClose={onClose}
+      tabIndex={-1}
+      className={appendClass(s.dialog, s.size[size])}
+      aria-labelledby={titleId}
+      // Only this dialog's own close event: a confirmation stacked on top closes by itself.
+      onClose={(e) => e.target === e.currentTarget && onClose()}
       // Clicking the backdrop (the <dialog> itself, not its content) closes it.
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <header className={s.header}>
         <div>
           {eyebrow && <p className={s.eyebrow}>{eyebrow}</p>}
-          <h2 id="dialog-title" className={s.title}>
+          <h2 id={titleId} className={s.title}>
             {title}
           </h2>
         </div>

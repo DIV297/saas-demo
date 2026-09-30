@@ -5,7 +5,7 @@
  * IST is a fixed UTC+05:30 with no daylight saving, so converting is a constant shift.
  * In production this would be each company's configured timezone.
  */
-export const BUSINESS_TZ = "Asia/Kolkata";
+/** Asia/Kolkata. */
 export const BUSINESS_TZ_LABEL = "IST";
 
 const IST_OFFSET_MS = (5 * 60 + 30) * 60_000;
@@ -14,6 +14,19 @@ const DAY_MS = 24 * 60 * 60_000;
 /** A Date whose UTC fields read as IST wall-clock time (internal helper). */
 const toIst = (date: Date) => new Date(date.getTime() + IST_OFFSET_MS);
 const fromIst = (date: Date) => new Date(date.getTime() - IST_OFFSET_MS);
+
+/** Calendar fields of `date` in IST (month 0–11, weekday 0 = Sunday), for formatting without Intl. */
+export function istParts(date: Date) {
+  const ist = toIst(date);
+  return {
+    year: ist.getUTCFullYear(),
+    month: ist.getUTCMonth(),
+    day: ist.getUTCDate(),
+    weekday: ist.getUTCDay(),
+    hour: ist.getUTCHours(),
+    minute: ist.getUTCMinutes(),
+  };
+}
 
 /** Midnight IST of the day containing `date`. */
 export function startOfDay(date: Date): Date {

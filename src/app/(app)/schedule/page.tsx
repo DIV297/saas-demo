@@ -1,5 +1,5 @@
 import { ScheduleBoard } from "@/components/schedule/ScheduleBoard";
-import { WeekNav } from "@/components/schedule/WeekNav";
+import { ThisWeekLink, WeekNav } from "@/components/schedule/WeekNav";
 import { PageHeader } from "@/components/ui";
 import { addDays, startOfWeek } from "@/utils/date";
 import { listCustomers, listJobs, listTechnicians } from "@/server/repositories";
@@ -21,7 +21,12 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
     <>
       <PageHeader
         title="Schedule"
-        meta={`${jobs.length} this week`}
+        meta={
+          <>
+            {jobs.length} this week
+            {offset !== 0 && <ThisWeekLink />}
+          </>
+        }
         actions={<WeekNav weekStart={weekStart} offset={offset} />}
         sticky
       />

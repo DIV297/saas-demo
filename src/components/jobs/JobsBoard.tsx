@@ -4,9 +4,17 @@ import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Card, EmptyState, TextField } from "@/components/ui";
 import { useJobs, useUpdateJobStatus } from "@/hooks";
-import { countByStatus, filterByStatus, isReschedule, sortForBoard } from "@/utils/jobs";
+import {
+  countByStatus,
+  filterByStatus,
+  isReschedule,
+  needsConfirmation,
+  sortForBoard,
+  type ConfirmableStatus,
+} from "@/utils/jobs";
 import { matchesQuery } from "@/utils/search";
 import type { JobStatus, JobWithRelations, StatusFilter, Technician } from "@/types";
+import { ConfirmStatusDialog } from "./ConfirmStatusDialog";
 import { JobDetailsDialog } from "./JobDetailsDialog";
 import { JobTable } from "./JobTable";
 import { StatusTabs } from "./StatusTabs";
@@ -22,6 +30,7 @@ export function JobsBoard({ initialJobs, technicians }: JobsBoardProps) {
   const { data: jobs = [] } = useJobs(initialJobs);
   const updateStatus = useUpdateJobStatus();
   const [rescheduling, setRescheduling] = useState<JobWithRelations | null>(null);
+  const [confirming, setConfirming] = useState<{ job: JobWithRelations; status: ConfirmableStatus } | null>(null);
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
 
@@ -35,9 +44,18 @@ export function JobsBoard({ initialJobs, technicians }: JobsBoardProps) {
     [jobs, filter, query],
   );
 
-  // Moving back to Scheduled needs a new date and time, so it opens the reschedule form instead.
-  const changeStatus = (job: JobWithRelations, status: JobStatus) =>
-    isReschedule(job.status, status) ? setRescheduling(job) : updateStatus.mutate({ id: job.id, status });
+  // Moving back to Scheduled needs a new date and time; cancelling or completing asks for confirmation first.
+  const changeStatus = (job: JobWithRelations, status: JobStatus) => {
+    if (isReschedule(job.status, status)) setRescheduling(job);
+    else if (needsConfirmation(status)) setConfirming({ job, status });
+    else updateStatus.mutate({ id: job.id, status });
+  };
+
+  const confirmStatus = () => {
+    if (!confirming) return;
+    updateStatus.mutate({ id: confirming.job.id, status: confirming.status }); // optimistic: the row updates at once
+    setConfirming(null);
+  };
 
   return (
     <>
@@ -68,6 +86,7 @@ export function JobsBoard({ initialJobs, technicians }: JobsBoardProps) {
         )}
       </Card>
 
+      <ConfirmStatusDialog status={confirming?.status ?? null} onConfirm={confirmStatus} onClose={() => setConfirming(null)} />
       <JobDetailsDialog
         job={rescheduling}
         technicians={technicians}

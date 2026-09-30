@@ -7,10 +7,12 @@ import { useUpdateJob } from "@/hooks";
 import type { JobStatus, JobWithRelations, Technician } from "@/types";
 import { BUSINESS_TZ_LABEL } from "@/utils/date";
 import { formatCurrency, formatDayShort, formatTimeRange } from "@/utils/format";
+import type { ConfirmableStatus } from "@/utils/jobs";
+import { ConfirmStatusDialog } from "./ConfirmStatusDialog";
 import { EditJobForm } from "./EditJobForm";
 import { jobDetailsStyles as s } from "./styles";
 
-type JobDialogMode = "view" | "edit" | "reschedule" | "confirmCancel";
+type JobDialogMode = "view" | "edit" | "reschedule";
 
 interface JobDetailsDialogProps {
   job: JobWithRelations | null; // null = closed
@@ -45,9 +47,10 @@ interface JobDetailsProps {
 
 function JobDetails({ job, technicians, initialMode, onDone }: JobDetailsProps) {
   const [mode, setMode] = useState(initialMode);
+  const [confirming, setConfirming] = useState<ConfirmableStatus | null>(null);
   const updateJob = useUpdateJob();
 
-  const setStatus = (status: JobStatus) => updateJob.mutate({ id: job.id, status }, { onSuccess: onDone });
+  const confirmStatus = () => confirming && updateJob.mutate({ id: job.id, status: confirming }, { onSuccess: onDone });
 
   if (mode === "edit" || mode === "reschedule") {
     return (
@@ -62,7 +65,7 @@ function JobDetails({ job, technicians, initialMode, onDone }: JobDetailsProps) 
   }
 
   const cancelButton = (
-    <Button variant="dangerGhost" className={s.footerStart} onClick={() => setMode("confirmCancel")}>
+    <Button variant="dangerGhost" className={s.footerStart} onClick={() => setConfirming("cancelled")}>
       <XCircle size={16} aria-hidden />
       Cancel booking
     </Button>
@@ -85,9 +88,9 @@ function JobDetails({ job, technicians, initialMode, onDone }: JobDetailsProps) 
           <CalendarClock size={16} aria-hidden />
           Reschedule
         </Button>
-        <Button onClick={() => setStatus("completed")} disabled={updateJob.isPending}>
+        <Button onClick={() => setConfirming("completed")}>
           <CheckCircle2 size={16} aria-hidden />
-          {updateJob.isPending ? "Saving…" : "Mark completed"}
+          Mark completed
         </Button>
       </>
     ),
@@ -136,24 +139,20 @@ function JobDetails({ job, technicians, initialMode, onDone }: JobDetailsProps) 
             <span className={s.sub}>{job.technician.skill}</span>
           </dd>
         </dl>
-        {updateJob.isError && <p className={s.error}>{updateJob.error.message}</p>}
       </div>
 
-      <DialogFooter>
-        {mode === "confirmCancel" ? (
-          <>
-            <p className={s.confirmText}>Cancel this booking? It stays in the history as Cancelled.</p>
-            <Button variant="ghost" onClick={() => setMode("view")}>
-              Keep booking
-            </Button>
-            <Button variant="danger" onClick={() => setStatus("cancelled")} disabled={updateJob.isPending}>
-              {updateJob.isPending ? "Cancelling…" : "Yes, cancel"}
-            </Button>
-          </>
-        ) : (
-          actions[job.status]
-        )}
-      </DialogFooter>
+      <DialogFooter>{actions[job.status]}</DialogFooter>
+
+      <ConfirmStatusDialog
+        status={confirming}
+        pending={updateJob.isPending}
+        error={updateJob.error?.message}
+        onConfirm={confirmStatus}
+        onClose={() => {
+          setConfirming(null);
+          updateJob.reset();
+        }}
+      />
     </>
   );
 }
