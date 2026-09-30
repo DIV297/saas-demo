@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { SERVICE_TYPES } from "./constants";
+import type { JobStatus } from "@/types";
+import { JOB_STATUSES, SERVICE_TYPES } from "./constants";
 
 /**
  * Input for booking a new job. Shared by the API route (server-side validation)
@@ -16,3 +17,15 @@ export const createJobSchema = z.object({
 });
 
 export type CreateJobInput = z.input<typeof createJobSchema>;
+
+/**
+ * Editing a booking: any subset of the schedulable fields, plus status
+ * (cancelling sets status "cancelled"; the job is kept, never deleted).
+ */
+export const updateJobSchema = createJobSchema
+  .pick({ technicianId: true, title: true, scheduledAt: true, durationMins: true })
+  .extend({ status: z.enum(JOB_STATUSES as [JobStatus, ...JobStatus[]]) })
+  .partial()
+  .refine((patch) => Object.keys(patch).length > 0, "Nothing to update");
+
+export type UpdateJobInput = z.input<typeof updateJobSchema>;

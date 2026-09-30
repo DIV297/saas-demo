@@ -1,4 +1,4 @@
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "@/utils/format";
 import { appendClass } from "@/styles/classes";
 import { revenueBarsStyles as s } from "./styles";
 

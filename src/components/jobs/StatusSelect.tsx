@@ -1,9 +1,10 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
-import { JOB_STATUSES, JOB_STATUS_LABEL } from "@/lib/constants";
+import { Dropdown, StatusBadge, StatusDot } from "@/components/ui";
+import { JOB_STATUS_LABEL } from "@/lib/constants";
 import { appendClass, statusClasses } from "@/styles/classes";
 import type { JobStatus } from "@/types";
+import { isReschedule, isStatusLocked, STATUS_TRANSITIONS } from "@/utils/jobs";
 import { statusSelectStyles as s } from "./styles";
 
 interface StatusSelectProps {
@@ -11,26 +12,29 @@ interface StatusSelectProps {
   onChange: (status: JobStatus) => void;
 }
 
-/** Looks like the status badge, but is a native <select> so it's accessible for free. */
+/**
+ * The status badge as a brand Dropdown, offering only the moves allowed from the current status
+ * (see STATUS_TRANSITIONS). "In progress" is never offered: it starts automatically at the booked time.
+ * Completed jobs are final, so they show a plain badge.
+ */
 export function StatusSelect({ value, onChange }: StatusSelectProps) {
+  if (isStatusLocked(value)) return <StatusBadge status={value} />;
+
+  const options = [value, ...STATUS_TRANSITIONS[value]].map((status) => ({
+    value: status,
+    label: isReschedule(value, status) ? "Reschedule…" : JOB_STATUS_LABEL[status],
+    icon: <StatusDot status={status} />,
+  }));
   const tone = statusClasses[value];
 
   return (
-    <span className={appendClass(s.wrapper, tone.soft, tone.text)}>
-      <span className={s.dot} aria-hidden />
-      <select
-        value={value}
-        aria-label="Change status"
-        onChange={(e) => onChange(e.target.value as JobStatus)}
-        className={s.select}
-      >
-        {JOB_STATUSES.map((status) => (
-          <option key={status} value={status}>
-            {JOB_STATUS_LABEL[status]}
-          </option>
-        ))}
-      </select>
-      <ChevronDown size={14} className={s.chevron} aria-hidden />
-    </span>
+    <Dropdown
+      label="Change status"
+      variant="field"
+      value={value}
+      options={options}
+      onChange={onChange}
+      className={appendClass(s.trigger, tone.soft, tone.text)}
+    />
   );
 }

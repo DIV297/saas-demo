@@ -30,12 +30,13 @@ export const SERVICE_TYPES = [
 
 /** Booking form options. */
 export const BOOKING_HOURS = { first: 7, last: 19 }; // 7:00 AM – 7:30 PM start times
-export const DURATION_OPTIONS = [30, 60, 90, 120, 180, 240, 360, 480];
+export const DURATION_OPTIONS = [30, 60, 90, 120, 150, 180, 240, 360, 480];
 
 export const JOB_STATUS_LABEL: Record<JobStatus, string> = {
   scheduled: "Scheduled",
   in_progress: "In Progress",
   completed: "Completed",
+  cancelled: "Cancelled",
 };
 
 export const JOB_STATUSES = Object.keys(JOB_STATUS_LABEL) as JobStatus[];

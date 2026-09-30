@@ -1,7 +1,7 @@
 "use client";
 
 import { useDashboardStats } from "@/hooks";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency } from "@/utils/format";
 import type { DashboardStats } from "@/types";
 import { RevenueBars } from "./RevenueBars";
 import { StatCard } from "./StatCard";

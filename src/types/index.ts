@@ -1,4 +1,10 @@
-export type JobStatus = "scheduled" | "in_progress" | "completed";
+import type { ReactNode } from "react";
+
+/** Cancelled jobs are kept (not deleted) so the history stays complete. */
+export type JobStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
+
+/** Status filter used by tabs: a status, or everything. */
+export type StatusFilter = JobStatus | "all";
 
 export type ServiceType =
   | "Plumbing"
@@ -44,7 +50,7 @@ export interface Job {
   scheduledAt: string; // ISO datetime
   durationMins: number;
   status: JobStatus;
-  amount: number; // USD
+  amount: number; // INR (₹)
 }
 
 /** A job joined with the customer + technician it references. */
@@ -64,4 +70,16 @@ export interface DashboardStats {
 export interface CustomerWithHistory extends Customer {
   jobs: JobWithRelations[];
   lifetimeValue: number;
+}
+
+/** One choice in a picker (Segmented tabs, Dropdown, SelectField). */
+export interface Option<T extends string = string> {
+  value: T;
+  label: string;
+  /** Secondary text, e.g. a technician's trade or a customer's city (also searched). */
+  hint?: string;
+  /** Small number on the right, e.g. how many customers are in that city. */
+  count?: number;
+  /** Leading visual: a status dot, avatar or icon. */
+  icon?: ReactNode;
 }

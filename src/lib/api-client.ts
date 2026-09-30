@@ -1,5 +1,5 @@
 import type { Customer, CustomerFilters, DashboardStats, JobStatus, JobWithRelations } from "@/types";
-import type { CreateJobInput } from "./schemas";
+import type { CreateJobInput, UpdateJobInput } from "./schemas";
 
 /** Build "?a=1&b=2", skipping empty values. */
 function toQueryString(params: Record<string, string | undefined>): string {
@@ -9,7 +9,7 @@ function toQueryString(params: Record<string, string | undefined>): string {
 }
 
 /** All API endpoints in one place. Hooks call these; components never call fetch directly. */
-export const endpoints = {
+const endpoints = {
   login: "/api/auth/login",
   logout: "/api/auth/logout",
   stats: "/api/stats",
@@ -18,14 +18,14 @@ export const endpoints = {
   customers: (filters: CustomerFilters = {}) => `/api/customers${toQueryString({ ...filters })}`,
 };
 
-export class ApiError extends Error {
+class ApiError extends Error {
   constructor(message: string, public status: number) {
     super(message);
   }
 }
 
 /** Typed fetch wrapper: unwraps `{ data }` and turns error responses into ApiError. */
-export async function request<T>(url: string, init?: RequestInit): Promise<T> {
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, {
     ...init,
     headers: { "Content-Type": "application/json", ...init?.headers },
@@ -53,9 +53,9 @@ export const api = {
   createJob: (input: CreateJobInput) =>
     request<JobWithRelations>(endpoints.jobs, { method: "POST", body: JSON.stringify(input) }),
 
-  updateJobStatus: ({ id, status }: { id: string; status: JobStatus }) =>
-    request<JobWithRelations>(endpoints.job(id), {
-      method: "PATCH",
-      body: JSON.stringify({ status }),
-    }),
+  /** Reschedule, reassign, edit or cancel (status "cancelled") a job. */
+  updateJob: ({ id, ...patch }: { id: string } & UpdateJobInput) =>
+    request<JobWithRelations>(endpoints.job(id), { method: "PATCH", body: JSON.stringify(patch) }),
+
+  updateJobStatus: ({ id, status }: { id: string; status: JobStatus }) => api.updateJob({ id, status }),
 };

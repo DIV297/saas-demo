@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { Avatar, Tooltip } from "@/components/ui";
+import { Avatar, PendingBar, Tooltip } from "@/components/ui";
 import { NAV_ITEMS } from "@/lib/constants";
 import { appendClass } from "@/styles/classes";
 import { Logo } from "./Logo";
@@ -50,6 +50,7 @@ export function Sidebar({ company, collapsed, onToggle }: SidebarProps) {
                 className={appendClass(s.link.base, s.link[mode])}
               >
                 <span className={s.activeTick} />
+                <PendingBar />
                 <NavIcon name={item.icon} />
                 {!collapsed && (
                   <>
@@ -64,7 +65,7 @@ export function Sidebar({ company, collapsed, onToggle }: SidebarProps) {
 
         {collapsed ? (
           <Tooltip as="div" side="right" content={company} className={s.accountCompact}>
-            <Avatar name={company} size="sm" tone="signal" />
+            <Avatar name={company} size="sm" tone="brand" />
           </Tooltip>
         ) : (
           <div className={s.account}>
@@ -83,6 +84,7 @@ export function Sidebar({ company, collapsed, onToggle }: SidebarProps) {
               <NavIcon name={item.icon} />
             </span>
             {item.label}
+            <PendingBar />
           </Link>
         ))}
       </nav>

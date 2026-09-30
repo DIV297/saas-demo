@@ -1,35 +1,31 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
-import { Button, Dialog, SelectField, TextField } from "@/components/ui";
+import { useState, type FormEvent } from "react";
+import { CustomerField, TechnicianField, TimeFields, type CustomerChoice } from "@/components/jobs/JobFields";
+import { jobFormStyles as s } from "@/components/jobs/styles";
+import { Button, Dialog, DialogFooter, SelectField, SERVICE_ICONS, TextField } from "@/components/ui";
 import { useCreateJob } from "@/hooks";
-import { BOOKING_HOURS, DURATION_OPTIONS, SERVICE_TYPES } from "@/lib/constants";
-import { formatDate } from "@/lib/format";
+import { SERVICE_TYPES } from "@/lib/constants";
 import { createJobSchema } from "@/lib/schemas";
-import type { Customer, ServiceType, Technician } from "@/types";
-import { bookingDialogStyles as s } from "./styles";
+import type { ServiceType, Technician } from "@/types";
+import { atTimeValue } from "@/utils/date";
+import { formatDayShort } from "@/utils/format";
+import { isInFuture, JOB_CHANGE_MESSAGE } from "@/utils/jobs";
+import { suggestStart } from "@/utils/options";
 
-type CustomerOption = Pick<Customer, "id" | "name">;
+const DEFAULT_START = "09:00";
+
+const SERVICE_OPTIONS = SERVICE_TYPES.map((service) => {
+  const Icon = SERVICE_ICONS[service];
+  return { value: service, label: service, icon: <Icon size={16} aria-hidden /> };
+});
 
 interface BookingDialogProps {
   day: Date | null; // null = closed
-  customers: CustomerOption[];
+  customers: CustomerChoice[];
   technicians: Technician[];
   onClose: () => void;
 }
-
-/** Half-hour start times, e.g. { value: "09:30", label: "9:30 AM" }. */
-const TIME_OPTIONS = Array.from({ length: (BOOKING_HOURS.last - BOOKING_HOURS.first + 1) * 2 }, (_, i) => {
-  const hour = BOOKING_HOURS.first + Math.floor(i / 2);
-  const minute = i % 2 ? "30" : "00";
-  const label = `${hour % 12 || 12}:${minute} ${hour < 12 ? "AM" : "PM"}`;
-  return { value: `${String(hour).padStart(2, "0")}:${minute}`, label };
-});
-
-const DURATION_SELECT = DURATION_OPTIONS.map((mins) => ({
-  value: String(mins),
-  label: mins < 60 ? `${mins} min` : `${mins / 60} hr${mins > 60 ? "s" : ""}`,
-}));
 
 /** Book a job on the day the user clicked in the calendar. */
 export function BookingDialog({ day, customers, technicians, onClose }: BookingDialogProps) {
@@ -38,7 +34,7 @@ export function BookingDialog({ day, customers, technicians, onClose }: BookingD
       open={day !== null}
       onClose={onClose}
       eyebrow="New booking"
-      title={day ? formatDate(day, { weekday: "long", month: "long", day: "numeric" }) : ""}
+      title={day ? formatDayShort(day) : ""}
     >
       {/* Keyed by day so the form resets each time a different day is clicked. */}
       {day && (
@@ -50,7 +46,7 @@ export function BookingDialog({ day, customers, technicians, onClose }: BookingD
 
 interface BookingFormProps {
   day: Date;
-  customers: CustomerOption[];
+  customers: CustomerChoice[];
   technicians: Technician[];
   onDone: () => void;
 }
@@ -58,25 +54,20 @@ interface BookingFormProps {
 function BookingForm({ day, customers, technicians, onDone }: BookingFormProps) {
   const createJob = useCreateJob();
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     customerId: "",
     service: "Plumbing" as ServiceType,
     technicianId: technicians.find((t) => t.skill === "Plumbing")?.id ?? "",
     title: "",
-    time: "09:00",
+    // 9 am on the clicked day, or the next free slot if that's already past (booking for today).
+    time: suggestStart(atTimeValue(day, DEFAULT_START)).time,
     durationMins: "60",
-  });
+  }));
 
   const update = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setError(null); // the user is fixing the form: drop the stale message
   };
-
-  // Show the technicians for the chosen trade first; fall back to everyone.
-  const technicianOptions = useMemo(() => {
-    const skilled = technicians.filter((t) => t.skill === form.service);
-    return (skilled.length ? skilled : technicians).map((t) => ({ value: t.id, label: `${t.name} · ${t.skill}` }));
-  }, [technicians, form.service]);
 
   const changeService = (service: ServiceType) => {
     const match = technicians.find((t) => t.skill === service);
@@ -86,18 +77,21 @@ function BookingForm({ day, customers, technicians, onDone }: BookingFormProps) 
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const date = day.toISOString().slice(0, 10); // business-timezone date (see lib/date.ts)
 
     const parsed = createJobSchema.safeParse({
       customerId: form.customerId,
       technicianId: form.technicianId,
       service: form.service,
       title: form.title,
-      scheduledAt: `${date}T${form.time}:00.000Z`,
+      scheduledAt: atTimeValue(day, form.time).toISOString(),
       durationMins: Number(form.durationMins),
     });
     if (!parsed.success) {
       setError(parsed.error.issues[0]?.message ?? "Please check the form");
+      return;
+    }
+    if (!isInFuture(parsed.data.scheduledAt)) {
+      setError(JOB_CHANGE_MESSAGE.past_time);
       return;
     }
 
@@ -107,28 +101,16 @@ function BookingForm({ day, customers, technicians, onDone }: BookingFormProps) 
 
   return (
     <form className={s.form} onSubmit={submit} noValidate>
-      <SelectField
-        id="booking-customer"
-        label="Customer"
-        value={form.customerId}
-        onChange={(e) => update("customerId", e.target.value)}
-        options={[{ value: "", label: "Select a customer…" }, ...customers.map((c) => ({ value: c.id, label: c.name }))]}
-      />
+      <CustomerField id="booking-customer" customers={customers} value={form.customerId} onChange={(id) => update("customerId", id)} />
 
       <div className={s.row}>
-        <SelectField
-          id="booking-service"
-          label="Service"
-          value={form.service}
-          onChange={(e) => changeService(e.target.value as ServiceType)}
-          options={SERVICE_TYPES.map((service) => ({ value: service, label: service }))}
-        />
-        <SelectField
+        <SelectField id="booking-service" label="Service" options={SERVICE_OPTIONS} value={form.service} onChange={changeService} />
+        <TechnicianField
           id="booking-technician"
-          label="Technician"
+          technicians={technicians}
+          service={form.service}
           value={form.technicianId}
-          onChange={(e) => update("technicianId", e.target.value)}
-          options={technicianOptions}
+          onChange={(id) => update("technicianId", id)}
         />
       </div>
 
@@ -141,22 +123,13 @@ function BookingForm({ day, customers, technicians, onDone }: BookingFormProps) 
         maxLength={80}
       />
 
-      <div className={s.row}>
-        <SelectField
-          id="booking-time"
-          label="Start time"
-          value={form.time}
-          onChange={(e) => update("time", e.target.value)}
-          options={TIME_OPTIONS}
-        />
-        <SelectField
-          id="booking-duration"
-          label="Duration"
-          value={form.durationMins}
-          onChange={(e) => update("durationMins", e.target.value)}
-          options={DURATION_SELECT}
-        />
-      </div>
+      <TimeFields
+        idPrefix="booking"
+        time={form.time}
+        durationMins={form.durationMins}
+        onTimeChange={(time) => update("time", time)}
+        onDurationChange={(mins) => update("durationMins", mins)}
+      />
 
       {error && (
         <p role="alert" className={s.error}>
@@ -164,14 +137,14 @@ function BookingForm({ day, customers, technicians, onDone }: BookingFormProps) 
         </p>
       )}
 
-      <div className={s.footer}>
+      <DialogFooter>
         <Button type="button" variant="ghost" onClick={onDone}>
           Cancel
         </Button>
         <Button type="submit" disabled={createJob.isPending}>
           {createJob.isPending ? "Booking…" : "Book job"}
         </Button>
-      </div>
+      </DialogFooter>
     </form>
   );
 }

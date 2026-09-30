@@ -1,5 +1,5 @@
 import { ServiceTag, StatusBadge, TechnicianAvatar } from "@/components/ui";
-import { formatDate, formatTime } from "@/lib/format";
+import { formatDate, formatTime } from "@/utils/format";
 import { table } from "@/styles/classes";
 import type { JobStatus, JobWithRelations } from "@/types";
 import { StatusSelect } from "./StatusSelect";
@@ -8,7 +8,7 @@ import { jobTableStyles as s } from "./styles";
 interface JobTableProps {
   jobs: JobWithRelations[];
   /** When provided, the status column becomes an editable dropdown. */
-  onStatusChange?: (id: string, status: JobStatus) => void;
+  onStatusChange?: (job: JobWithRelations, status: JobStatus) => void;
   hideCustomer?: boolean;
 }
 
@@ -56,7 +56,7 @@ export function JobTable({ jobs, onStatusChange, hideCustomer }: JobTableProps) 
               </td>
               <td className={table.cell} data-label="Status">
                 {onStatusChange ? (
-                  <StatusSelect value={job.status} onChange={(status) => onStatusChange(job.id, status)} />
+                  <StatusSelect value={job.status} onChange={(status) => onStatusChange(job, status)} />
                 ) : (
                   <StatusBadge status={job.status} />
                 )}

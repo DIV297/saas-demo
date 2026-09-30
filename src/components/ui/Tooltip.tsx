@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { appendClass } from "@/styles/classes";
+import { placeTooltip } from "@/utils/position";
 import { tooltipStyles as s } from "./styles";
 
 interface TooltipProps {
@@ -15,23 +16,15 @@ interface TooltipProps {
   style?: CSSProperties;
   /** Make the trigger reachable by keyboard (for non-interactive elements like job blocks). */
   focusable?: boolean;
-  /** "top" flips below near the viewport edge; "right" is for side navigation. */
+  /** Preferred side; flips automatically when there's no room. "right" is for side navigation and menus. */
   side?: "top" | "right";
   disabled?: boolean;
 }
 
-interface Position {
-  x: number;
-  y: number;
-  placement: "above" | "below" | "right";
-}
-
-const GAP = 8;
-const MIN_SPACE_ABOVE = 96; // flip below the trigger when it's too close to the top of the viewport
-
 /**
- * Hover / focus tooltip rendered into <body> with fixed positioning,
- * so scroll containers and overflow-hidden parents can't clip it.
+ * Hover / focus tooltip rendered into <body> with fixed positioning, so scroll containers and
+ * clipped parents can't cut it off. It measures itself and always stays inside the window:
+ * "top" flips below when there's no room above; "right" flips to the left near the right edge.
  */
 export function Tooltip({
   content,
@@ -45,26 +38,25 @@ export function Tooltip({
   disabled,
 }: TooltipProps) {
   const ref = useRef<HTMLElement>(null);
-  const [position, setPosition] = useState<Position | null>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+  const [anchor, setAnchor] = useState<DOMRect | null>(null);
+  const [coords, setCoords] = useState<{ left: number; top: number } | null>(null);
 
   const open = () => {
     const el = ref.current;
     if (!el || disabled) return;
     if (onlyWhenTruncated && el.scrollWidth <= el.clientWidth) return;
-
-    const rect = el.getBoundingClientRect();
-    if (side === "right") {
-      setPosition({ x: rect.right + GAP, y: rect.top + rect.height / 2, placement: "right" });
-      return;
-    }
-    const placement = rect.top < MIN_SPACE_ABOVE ? "below" : "above";
-    setPosition({
-      x: rect.left + rect.width / 2,
-      y: placement === "above" ? rect.top - GAP : rect.bottom + GAP,
-      placement,
-    });
+    setCoords(null);
+    setAnchor(el.getBoundingClientRect());
   };
-  const close = () => setPosition(null);
+  const close = () => setAnchor(null);
+
+  // Place the bubble once its size is known (it renders hidden for this first measurement).
+  useLayoutEffect(() => {
+    const bubble = bubbleRef.current;
+    if (!anchor || !bubble) return;
+    setCoords(placeTooltip(anchor, bubble.getBoundingClientRect(), side));
+  }, [anchor, side]);
 
   return (
     <>
@@ -80,12 +72,13 @@ export function Tooltip({
       >
         {children}
       </Tag>
-      {position &&
+      {anchor &&
         createPortal(
           <div
+            ref={bubbleRef}
             role="tooltip"
-            className={appendClass(s.bubble, s.placement[position.placement])}
-            style={{ left: position.x, top: position.y }}
+            className={s.bubble}
+            style={{ left: coords?.left ?? 0, top: coords?.top ?? 0, visibility: coords ? "visible" : "hidden" }}
           >
             {content}
           </div>,

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { CustomerAvatar, TruncatedText } from "@/components/ui";
-import { formatDate } from "@/lib/format";
+import { CustomerAvatar, PendingBar, TruncatedText } from "@/components/ui";
+import { formatDate } from "@/utils/format";
 import { appendClass } from "@/styles/classes";
 import type { Customer } from "@/types";
 import { customerTableStyles as s } from "./styles";
@@ -37,6 +37,7 @@ export function CustomerTable({ customers }: { customers: Customer[] }) {
               </span>
               <p className={s.since}>{formatDate(c.since, { month: "short", year: "numeric" })}</p>
               <ChevronRight size={16} aria-hidden className={s.chevron} />
+              <PendingBar />
             </Link>
           </li>
         ))}

@@ -7,12 +7,12 @@
     @apply bg-paper text-ink antialiased;
   }
   body {
-    @apply font-sans text-body;
+    @apply font-sans text-primary;
   }
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ink;
   }
   ::selection {
-    @apply bg-signal-soft;
+    @apply bg-brand-soft;
   }
 }

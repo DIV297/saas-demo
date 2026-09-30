@@ -50,3 +50,8 @@ export function Dialog({ open, onClose, eyebrow, title, children }: DialogProps)
     </dialog>
   );
 }
+
+/** Sticky action bar at the bottom of a Dialog (buttons stay reachable while the form scrolls). */
+export function DialogFooter({ children }: { children: ReactNode }) {
+  return <div className={s.footer}>{children}</div>;
+}

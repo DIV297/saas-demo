@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { initials } from "@/lib/format";
+import { initials } from "@/utils/format";
 import { appendClass } from "@/styles/classes";
 import { avatarStyles as s } from "./styles";
 

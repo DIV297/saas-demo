@@ -1,11 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { CustomerProfile } from "@/components/customers/CustomerProfile";
-import { JobTable } from "@/components/jobs/JobTable";
-import { Card, EmptyState } from "@/components/ui";
+import { ServiceHistory } from "@/components/customers/ServiceHistory";
+import { PageHeader } from "@/components/ui";
+import { formatDate } from "@/utils/format";
 import { getCustomer } from "@/server/repositories";
-import { backLink, layoutAsideMain } from "@/styles/classes";
+import { layoutAsideMain } from "@/styles/classes";
 
 export default async function CustomerPage({ params }: PageProps<"/customers/[id]">) {
   const { id } = await params;
@@ -14,19 +13,15 @@ export default async function CustomerPage({ params }: PageProps<"/customers/[id
 
   return (
     <>
-      <Link href="/customers" className={backLink}>
-        <ArrowLeft size={16} aria-hidden /> All customers
-      </Link>
+      <PageHeader
+        parents={[{ label: "Customers", href: "/customers" }]}
+        title={customer.name}
+        meta={`${customer.plan} · since ${formatDate(customer.since, { month: "short", year: "numeric" })}`}
+      />
 
       <div className={layoutAsideMain}>
         <CustomerProfile customer={customer} />
-        <Card eyebrow="Service history" title={`${customer.jobs.length} work orders`} flush>
-          {customer.jobs.length ? (
-            <JobTable jobs={[...customer.jobs].reverse()} hideCustomer />
-          ) : (
-            <EmptyState title="No jobs yet" hint="Book this customer's first visit." />
-          )}
-        </Card>
+        <ServiceHistory jobs={[...customer.jobs].reverse()} />
       </div>
     </>
   );

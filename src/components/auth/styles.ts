@@ -5,11 +5,11 @@ export const loginFormStyles = {
   form: "grid gap-4",
   error: alertError,
   demoCard: appendClass(
-    "mt-2 grid cursor-pointer grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5 rounded-lg px-4 py-3 text-left text-label transition",
-    "bg-sunken hover:bg-signal-soft",
+    "mt-2 grid cursor-pointer grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5 rounded-lg px-4 py-3 text-left text-secondary transition",
+    "bg-sunken hover:bg-brand-soft",
   ),
   demoLabel: eyebrow,
-  demoAction: "row-span-2 font-semibold underline decoration-signal decoration-2 underline-offset-4",
+  demoAction: "row-span-2 font-semibold underline decoration-brand decoration-2 underline-offset-4",
   demoCredentials: "font-mono text-ink-2",
 } as const;
 
@@ -22,7 +22,7 @@ export const brandPanelStyles = {
     "mask-[linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)]",
   ),
   layer: "relative",
-  kicker: "mb-4 font-mono text-label text-signal",
+  kicker: "mb-4 font-mono text-secondary text-brand",
   headline: "font-display text-[clamp(2.5rem,5vw,4.25rem)] font-bold uppercase leading-[0.95] tracking-display",
   headlineMuted: "text-sidebar-muted",
 
@@ -32,9 +32,9 @@ export const brandPanelStyles = {
   track: "relative h-5.5 flex-1 rounded-sm bg-white/[0.04]",
   block: "absolute inset-y-[3px] origin-left rounded-[3px] opacity-90 motion-safe:animate-bar-in",
   blockTone: {
-    done: "bg-done-bright",
-    active: "bg-progress-bright",
-    booked: "bg-scheduled-bright",
+    done: "bg-success-bright",
+    active: "bg-brand",
+    booked: "bg-sidebar-muted",
   },
 } as const;
 

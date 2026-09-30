@@ -10,14 +10,17 @@ cleaning, etc.): customers, work orders, crew dispatch and scheduling.
 | Screen | What it shows |
 | --- | --- |
 | **Login** | Cookie-based sign-in, protected routes, sign-out |
-| **Overview** | KPIs (customers, active jobs, upcoming appointments, revenue + 4-week trend), a live **dispatch board** of today's jobs per technician, upcoming appointments, recently completed work |
-| **Work orders** | All jobs with customer, service, technician, date/time and status. Filter by status, search, and **change status inline** (saved through the API) |
-| **Schedule** | Week calendar with previous/next navigation. **Click a day to book a job** (validated form). Hover any job for full details. Turns into an agenda list on phones |
-| **Customers** | Search plus **filters by plan type and location** → profile page with contact details, site notes, lifetime value and service history |
+| **Overview** | KPIs (customers, active jobs, upcoming appointments, revenue + 4-week trend), a **dispatch timeline** that scrolls continuously across days (opens at *now*, loads more days as you scroll, pinned names and day labels), upcoming appointments, recently completed work |
+| **Work orders** | All jobs with customer, service, technician, date/time and status. In progress first, then upcoming. Filter by status, search, and **change status inline** following real job rules: jobs start (In progress) automatically at their booked time, completed jobs are final, and moving a job back to Scheduled asks for a new date and time. Enforced by the API too |
+| **Schedule** | Week calendar (sticky header, slide/swipe between weeks, past days fold away). **Book a job** from any day; **click a job to edit or cancel it** (cancelled jobs are kept in history and can be restored). Agenda list on phones |
+| **Customers** | Search plus **filters by plan type and location** → profile page with contact details, site notes, lifetime value and a **status-filterable service history** |
 
-The sidebar collapses to an icon rail (remembered across visits), and any truncated text shows in full on hover.
+The sidebar collapses to an icon rail (remembered across visits), the account menu sits under your name, and any truncated text shows in full on hover.
+Pages open in ~30–70 ms with a short ease-in animation that never delays content; on slow connections a thin yellow progress bar appears. Motion is turned off for users who prefer reduced motion. Every page has breadcrumbs.
 
 Security headers (CSP with nonces, HSTS, nosniff, frame protection…) are on every response. See [Production → Security](docs/PRODUCTION.md#4-security).
+
+Dummy data is set in India: times in **IST**, amounts in **₹** (Indian number format), customers in Mumbai, Pune, Bengaluru and Delhi.
 
 Desktop-first, fully usable on mobile (bottom tab bar, tables turn into cards, calendar turns into an agenda).
 
@@ -62,20 +65,23 @@ src/
 │   └── api/                # REST endpoints: auth, customers, jobs, stats
 ├── components/
 │   │                       # Each folder has a styles.ts with its component-specific classes
-│   ├── ui/                 # Reusable primitives: Button, Card, Dialog, TextField, SelectField, Segmented,
-│   │                       #   Tooltip/TruncatedText, StatusBadge, ServiceTag, Avatar/TechnicianAvatar…
+│   ├── ui/                 # Reusable primitives: Button, Card, Dialog, TextField, Dropdown (brand select,
+│   │                       #   optional search) + SelectField, Segmented, Tooltip, StatusBadge, Avatar…
 │   ├── layout/             # AppShell, ShellFrame (collapsible sidebar), Sidebar, Topbar, Logo
 │   ├── dashboard/          # StatGrid, StatCard, RevenueBars, DispatchBoard, UpcomingList
-│   ├── jobs/               # JobsBoard, JobTable, StatusTabs, StatusSelect, JobSummary (hover card)
+│   ├── jobs/               # JobsBoard, JobTable, StatusTabs, StatusSelect, JobDetailsDialog, EditJobForm,
+│   │                       #   JobFields (customer/technician/time fields shared by booking + editing)
 │   ├── customers/          # CustomerDirectory (search + filters), CustomerTable, CustomerProfile
 │   ├── schedule/           # ScheduleBoard, WeekCalendar, WeekNav, BookingDialog
 │   └── auth/               # LoginForm, BrandPanel
-├── hooks/                  # API hooks on TanStack Query: useJobs, useCreateJob, useCustomers, useLogin…
+├── hooks/                  # API hooks on TanStack Query (useJobs, useCreateJob…) + useClickOutside
 ├── data/                   # Dummy data (customers, technicians, jobs)
 ├── server/
 │   ├── db.ts               # In-memory data store (stand-in for PostgreSQL)
 │   └── repositories/       # Data-access layer. The only code that touches the store
-├── lib/                    # API client, query keys, Zod schemas, formatting, dates, constants, auth
+├── lib/                    # App wiring: API client, query keys, Zod schemas, constants, auth, security
+├── utils/                  # Pure helpers (no React): IST dates, formatting, job status rules, options,
+│                           #   timeline/calendar maths, positioning. Components only render and handle events
 ├── styles/
 │   ├── theme.css           # Design tokens (colours, type scale, fonts) → Tailwind utilities
 │   ├── fonts.ts            # Typefaces (Barlow Semi Condensed, IBM Plex Sans/Mono)

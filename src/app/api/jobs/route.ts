@@ -3,6 +3,7 @@ import { JOB_STATUSES } from "@/lib/constants";
 import { createJobSchema } from "@/lib/schemas";
 import { createJob, listJobs } from "@/server/repositories";
 import type { JobStatus } from "@/types";
+import { JOB_CHANGE_MESSAGE } from "@/utils/jobs";
 
 /** GET /api/jobs?status=&from=&to= */
 export async function GET(request: NextRequest) {
@@ -28,6 +29,7 @@ export async function POST(request: Request) {
   }
 
   const result = await createJob(parsed.data);
+  if (result === "past_time") return NextResponse.json({ error: JOB_CHANGE_MESSAGE.past_time }, { status: 422 });
   if (result === "unknown_customer" || result === "unknown_technician") {
     return NextResponse.json({ error: `Unknown ${result.replace("unknown_", "")}` }, { status: 422 });
   }

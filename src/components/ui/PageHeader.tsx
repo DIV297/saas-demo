@@ -1,20 +1,29 @@
 import type { ReactNode } from "react";
+import { appendClass } from "@/styles/classes";
+import { Breadcrumbs, type Crumb } from "./Breadcrumbs";
 import { pageHeaderStyles as s } from "./styles";
 
 interface PageHeaderProps {
-  eyebrow: string;
   title: string;
-  description?: string;
+  /** Parent pages, e.g. [{ label: "Customers", href: "/customers" }]. Home is always first. */
+  parents?: Crumb[];
+  /** One short fact shown after the title, e.g. "10 accounts". */
+  meta?: string;
   actions?: ReactNode;
+  /** Keep the whole row pinned under the top bar while the page scrolls (e.g. calendar controls). */
+  sticky?: boolean;
 }
 
-export function PageHeader({ eyebrow, title, description, actions }: PageHeaderProps) {
+/** One compact row: 🏠 › Parents › Title · meta ………… actions */
+export function PageHeader({ title, parents = [], meta, actions, sticky }: PageHeaderProps) {
   return (
-    <header className={s.header}>
+    <header className={appendClass(s.header, sticky && s.sticky)}>
       <div className={s.heading}>
-        <p className={s.eyebrow}>{eyebrow}</p>
-        <h1 className={s.title}>{title}</h1>
-        {description && <p className={s.description}>{description}</p>}
+        <Breadcrumbs items={parents} />
+        <h1 className={s.title} aria-current="page">
+          {title}
+        </h1>
+        {meta && <p className={s.meta}>{meta}</p>}
       </div>
       {actions && <div className={s.actions}>{actions}</div>}
     </header>

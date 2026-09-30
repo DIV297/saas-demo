@@ -1,7 +1,7 @@
 import { ScheduleBoard } from "@/components/schedule/ScheduleBoard";
 import { WeekNav } from "@/components/schedule/WeekNav";
 import { PageHeader } from "@/components/ui";
-import { addDays, startOfWeek } from "@/lib/date";
+import { addDays, startOfWeek } from "@/utils/date";
 import { listCustomers, listJobs, listTechnicians } from "@/server/repositories";
 
 export const metadata = { title: "Schedule" };
@@ -20,15 +20,16 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   return (
     <>
       <PageHeader
-        eyebrow="Calendar"
         title="Schedule"
-        description={`${jobs.length} appointments this week · click a day to book a job.`}
+        meta={`${jobs.length} this week`}
         actions={<WeekNav weekStart={weekStart} offset={offset} />}
+        sticky
       />
       <ScheduleBoard
         weekStart={weekStart.toISOString()}
+        offset={offset}
         jobs={jobs}
-        customers={customers.map(({ id, name }) => ({ id, name }))}
+        customers={customers.map(({ id, name, city, plan }) => ({ id, name, city, plan }))}
         technicians={technicians}
       />
     </>

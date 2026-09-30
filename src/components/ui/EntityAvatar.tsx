@@ -26,6 +26,6 @@ export function CustomerAvatar({
   size?: Size;
   highlight?: boolean;
 }) {
-  const tone = highlight ? "signal" : customer.plan === "Commercial" ? "ink" : "paper";
+  const tone = highlight ? "brand" : customer.plan === "Commercial" ? "ink" : "brandSoft";
   return <Avatar name={customer.name} icon={CUSTOMER_ICON} size={size} tone={tone} />;
 }

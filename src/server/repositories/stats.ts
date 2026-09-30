@@ -1,21 +1,21 @@
 import { db } from "@/server/db";
 import type { DashboardStats } from "@/types";
-import { startOfDay } from "@/lib/date";
+import { addDays, startOfDay } from "@/utils/date";
+import { startDueJobs } from "./jobs";
 
 const WEEKS_IN_CHART = 4;
 
 export async function getDashboardStats(): Promise<DashboardStats> {
   const now = new Date();
+  startDueJobs(now);
   const today = startOfDay(now);
 
   const completed = db.jobs.filter((j) => j.status === "completed");
 
   const revenueByWeek = Array.from({ length: WEEKS_IN_CHART }, (_, i) => {
     const weeksAgo = WEEKS_IN_CHART - 1 - i;
-    const end = new Date(today);
-    end.setUTCDate(end.getUTCDate() + 1 - weeksAgo * 7);
-    const start = new Date(end);
-    start.setUTCDate(start.getUTCDate() - 7);
+    const end = addDays(today, 1 - weeksAgo * 7);
+    const start = addDays(end, -7);
 
     const value = completed
       .filter((j) => {

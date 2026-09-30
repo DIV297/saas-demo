@@ -1,11 +1,11 @@
-import { Avatar } from "@/components/ui";
-import { formatDate } from "@/lib/format";
+import { BUSINESS_TZ_LABEL } from "@/utils/date";
+import { formatDayLong, formatTime } from "@/utils/format";
 import { Logo } from "./Logo";
-import { LogoutButton } from "./LogoutButton";
+import { UserMenu } from "./UserMenu";
 import { topbarStyles as s } from "./styles";
 
-export function Topbar({ userName }: { userName: string }) {
-  const today = formatDate(new Date(), { weekday: "long", month: "long", day: "numeric" });
+export function Topbar({ userName, company }: { userName: string; company: string }) {
+  const today = `${formatDayLong(new Date())} · ${formatTime(new Date())} ${BUSINESS_TZ_LABEL}`;
 
   return (
     <header className={s.bar}>
@@ -18,11 +18,7 @@ export function Topbar({ userName }: { userName: string }) {
       </p>
 
       <div className={s.actions}>
-        <div className={s.user}>
-          <Avatar name={userName} size="sm" tone="ink" />
-          <span className={s.userName}>{userName}</span>
-        </div>
-        <LogoutButton />
+        <UserMenu userName={userName} company={company} />
       </div>
     </header>
   );

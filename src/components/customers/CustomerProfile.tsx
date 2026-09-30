@@ -1,7 +1,7 @@
 import { Mail, MapPin, Phone, StickyNote } from "lucide-react";
 import type { ReactNode } from "react";
 import { Card, CustomerAvatar } from "@/components/ui";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatCurrency } from "@/utils/format";
 import { iconTile } from "@/styles/classes";
 import type { CustomerWithHistory } from "@/types";
 import { customerProfileStyles as s } from "./styles";
@@ -39,9 +39,6 @@ export function CustomerProfile({ customer }: { customer: CustomerWithHistory })
             {customer.plan} · {customer.id}
           </p>
           <h2 className={s.name}>{customer.name}</h2>
-          <p className={s.since}>
-            Customer since {formatDate(customer.since, { month: "long", year: "numeric" })}
-          </p>
         </div>
       </div>
 

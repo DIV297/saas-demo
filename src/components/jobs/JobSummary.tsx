@@ -1,5 +1,5 @@
 import { JOB_STATUS_LABEL } from "@/lib/constants";
-import { formatDate, formatTimeRange } from "@/lib/format";
+import { formatDayShort, formatTimeRange } from "@/utils/format";
 import { appendClass, statusClasses } from "@/styles/classes";
 import type { JobWithRelations } from "@/types";
 import { jobSummaryStyles as s } from "./styles";
@@ -20,7 +20,7 @@ export function JobSummary({ job }: { job: JobWithRelations }) {
         </dd>
         <dt className={s.label}>When</dt>
         <dd>
-          {formatDate(job.scheduledAt, { weekday: "short", month: "short", day: "numeric" })},{" "}
+          {formatDayShort(job.scheduledAt)},{" "}
           {formatTimeRange(job.scheduledAt, job.durationMins)}
         </dd>
         <dt className={s.label}>Tech</dt>

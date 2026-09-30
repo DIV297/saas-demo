@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { Card, EmptyState, TruncatedText } from "@/components/ui";
-import { formatDate, formatTime } from "@/lib/format";
+import { Card, EmptyState, PendingBar, TruncatedText } from "@/components/ui";
+import { formatDate, formatTime } from "@/utils/format";
 import { linkAccent, listRow } from "@/styles/classes";
 import type { JobWithRelations } from "@/types";
 import { upcomingListStyles as s } from "./styles";
@@ -9,12 +9,12 @@ import { upcomingListStyles as s } from "./styles";
 export function UpcomingList({ jobs }: { jobs: JobWithRelations[] }) {
   return (
     <Card
-      eyebrow="Next up"
       title="Upcoming appointments"
       flush
       action={
         <Link href="/schedule" className={linkAccent}>
           Schedule <ArrowUpRight size={14} aria-hidden />
+          <PendingBar />
         </Link>
       }
     >

@@ -1,19 +1,11 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { Option } from "@/types";
 import { segmentedStyles as s } from "./styles";
-
-export interface SegmentedOption<T extends string> {
-  value: T;
-  label: string;
-  /** Optional leading visual, e.g. a status dot or icon. */
-  icon?: ReactNode;
-  count?: number;
-}
 
 interface SegmentedProps<T extends string> {
   label: string; // accessible name of the group
-  options: SegmentedOption<T>[];
+  options: Option<T>[];
   value: T;
   onChange: (value: T) => void;
 }

@@ -15,22 +15,27 @@ export function useJobs(initialJobs?: JobWithRelations[]) {
   });
 }
 
-/**
- * Book a new job. On success, refresh cached jobs + KPIs, and re-render
- * server components (the week calendar reads jobs on the server).
- */
-export function useCreateJob() {
+/** After a booking changes: refresh cached jobs + KPIs and re-render server components (the calendar reads jobs on the server). */
+function useRefreshSchedule() {
   const queryClient = useQueryClient();
   const router = useRouter();
+  return () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
+    queryClient.invalidateQueries({ queryKey: queryKeys.stats });
+    router.refresh();
+  };
+}
 
-  return useMutation({
-    mutationFn: api.createJob,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.jobs });
-      queryClient.invalidateQueries({ queryKey: queryKeys.stats });
-      router.refresh();
-    },
-  });
+/** Book a new job. */
+export function useCreateJob() {
+  const refresh = useRefreshSchedule();
+  return useMutation({ mutationFn: api.createJob, onSuccess: refresh });
+}
+
+/** Edit, reschedule or cancel a booking (cancelling keeps the job with status "cancelled"). */
+export function useUpdateJob() {
+  const refresh = useRefreshSchedule();
+  return useMutation({ mutationFn: api.updateJob, onSuccess: refresh });
 }
 
 /** Change a job's status with an optimistic update and automatic rollback on failure. */

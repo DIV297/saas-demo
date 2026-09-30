@@ -9,7 +9,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
   const collapsed = (await cookies()).get(SIDEBAR_COOKIE)?.value === "1";
 
   return (
-    <ShellFrame company={DEMO_USER.company} initialCollapsed={collapsed} topbar={<Topbar userName={DEMO_USER.name} />}>
+    <ShellFrame company={DEMO_USER.company} initialCollapsed={collapsed} topbar={<Topbar userName={DEMO_USER.name} company={DEMO_USER.company} />}>
       {children}
     </ShellFrame>
   );

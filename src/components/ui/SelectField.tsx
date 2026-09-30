@@ -1,36 +1,19 @@
-import { ChevronDown } from "lucide-react";
-import type { ReactNode, SelectHTMLAttributes } from "react";
 import { appendClass } from "@/styles/classes";
+import { Dropdown, type DropdownProps } from "./Dropdown";
 import { selectFieldStyles as s } from "./styles";
 
-interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  options: { value: string; label: string }[];
-  label?: string;
-  icon?: ReactNode;
+interface SelectFieldProps<T extends string> extends Omit<DropdownProps<T>, "variant" | "id"> {
+  id: string;
 }
 
-/** Native <select> styled like TextField (keyboard + screen-reader support for free). */
-export function SelectField({ options, label, icon, id, className, ...props }: SelectFieldProps) {
-  const control = (
-    <span className={appendClass(s.wrapper, !label && className)}>
-      {icon && <span className={s.icon}>{icon}</span>}
-      <select id={id} className={appendClass(s.select, icon && s.selectWithIcon)} {...props}>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown size={16} className={s.chevron} aria-hidden />
-    </span>
-  );
-
-  if (!label) return control;
-
+/** Labelled form select: the brand Dropdown in its "field" look, laid out like TextField. */
+export function SelectField<T extends string>({ id, label, className, ...props }: SelectFieldProps<T>) {
   return (
-    <label htmlFor={id} className={appendClass(s.field, className)}>
-      <span className={s.label}>{label}</span>
-      {control}
-    </label>
+    <div className={appendClass(s.field, className)}>
+      <label htmlFor={id} className={s.label}>
+        {label}
+      </label>
+      <Dropdown id={id} label={label} variant="field" {...props} />
+    </div>
   );
 }

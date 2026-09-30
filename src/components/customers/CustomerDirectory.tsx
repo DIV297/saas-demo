@@ -2,10 +2,11 @@
 
 import { MapPin, Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Card, EmptyState, PageHeader, Segmented, SelectField, TextField } from "@/components/ui";
+import { Card, Dropdown, EmptyState, PageHeader, Segmented, TextField } from "@/components/ui";
 import { useCustomers } from "@/hooks";
 import { CUSTOMER_PLANS } from "@/lib/constants";
 import type { Customer, CustomerPlan } from "@/types";
+import { withCounts } from "@/utils/options";
 import { CustomerTable } from "./CustomerTable";
 import { customerDirectoryStyles as s } from "./styles";
 
@@ -27,19 +28,15 @@ export function CustomerDirectory({ initialCustomers, cities }: CustomerDirector
     initialCustomers,
   );
 
+  // Counts are for the whole directory, so they don't jump around while you filter.
   const planOptions = useMemo(
-    () => [
-      { value: "all" as const, label: "All", count: initialCustomers.length },
-      ...CUSTOMER_PLANS.map((p) => ({
-        value: p,
-        label: p,
-        count: initialCustomers.filter((c) => c.plan === p).length,
-      })),
-    ],
+    () => withCounts<Customer, PlanFilter>(initialCustomers, CUSTOMER_PLANS, (c) => c.plan, { value: "all", label: "All" }),
     [initialCustomers],
   );
-
-  const locationOptions = [{ value: "", label: "All locations" }, ...cities.map((c) => ({ value: c, label: c }))];
+  const locationOptions = useMemo(
+    () => withCounts(initialCustomers, cities, (c) => c.city, { value: "", label: "All locations" }),
+    [initialCustomers, cities],
+  );
   const hasFilters = query !== "" || plan !== "all" || city !== "";
 
   const clearFilters = () => {
@@ -51,9 +48,8 @@ export function CustomerDirectory({ initialCustomers, cities }: CustomerDirector
   return (
     <>
       <PageHeader
-        eyebrow="CRM"
         title="Customers"
-        description={isSearching ? "Searching…" : `${customers.length} ${hasFilters ? "matching" : "active"} accounts`}
+        meta={isSearching ? "Searching…" : `${customers.length} ${hasFilters ? "matching" : "accounts"}`}
         actions={
           <TextField
             type="search"
@@ -69,12 +65,12 @@ export function CustomerDirectory({ initialCustomers, cities }: CustomerDirector
       <Card flush>
         <div className={s.toolbar}>
           <Segmented label="Filter by plan type" options={planOptions} value={plan} onChange={setPlan} />
-          <SelectField
-            aria-label="Filter by location"
+          <Dropdown
+            label="Filter by location"
             icon={<MapPin size={16} />}
             options={locationOptions}
             value={city}
-            onChange={(e) => setCity(e.target.value)}
+            onChange={setCity}
             className={s.location}
           />
           {hasFilters && (
