@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Search } from "lucide-react";
+import { MapPin, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Card, Dropdown, EmptyState, PageHeader, Segmented, TextField } from "@/components/ui";
 import { useCustomers } from "@/hooks";
@@ -75,6 +75,7 @@ export function CustomerDirectory({ initialCustomers, cities }: CustomerDirector
           />
           {hasFilters && (
             <button type="button" onClick={clearFilters} className={s.clear}>
+              <X size={14} aria-hidden />
               Clear filters
             </button>
           )}

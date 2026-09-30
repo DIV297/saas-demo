@@ -73,12 +73,13 @@ export const pendingBarStyles = {
   bar: "pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 origin-left bg-brand opacity-0 motion-safe:animate-nav-progress motion-reduce:opacity-100",
 } as const;
 
-/** Tab-style picker (status filter, plan filter…). */
+/** Tab-style picker (status filter, plan filter…). 40px tall overall, like inputs and dropdowns, so toolbars line up. */
 export const segmentedStyles = {
-  list: "inline-flex max-w-full gap-0.5 overflow-x-auto rounded-lg bg-sunken p-[3px]",
+  /** Phones: full width with equal options, lining up with the full-width controls around it. */
+  list: "inline-flex max-w-full gap-0.5 overflow-x-auto rounded-lg bg-sunken p-[3px] max-sm:flex max-sm:w-full",
   option: appendClass(
     pressable,
-    "inline-flex h-8 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-md px-3 text-secondary font-medium text-ink-2 hover:text-ink aria-selected:bg-brand aria-selected:text-on-brand aria-selected:shadow-sm",
+    "inline-flex h-8.5 cursor-pointer items-center justify-center gap-1.5 max-sm:flex-1 max-sm:px-2 whitespace-nowrap rounded-md px-3 text-secondary font-medium text-ink-2 hover:text-ink aria-selected:bg-brand aria-selected:text-on-brand aria-selected:shadow-sm",
   ),
   count: "min-w-5 rounded-full bg-paper px-1.5 text-center font-mono text-secondary tabular-nums text-ink-3",
 } as const;

@@ -3,6 +3,7 @@
  * anything only used here lives in this file.
  */
 import {
+  linkAccent,
   appendClass,
   bgPaper,
   captionText,
@@ -73,7 +74,8 @@ export const customerDirectoryStyles = {
   search: "w-full md:w-72",
   toolbar: appendClass(stickyToolbar, "flex flex-wrap items-center gap-2 px-4 py-3"),
   location: "w-full sm:w-56",
-  clear: "text-secondary font-medium text-ink-2 underline decoration-brand decoration-2 underline-offset-4 transition hover:text-ink cursor-pointer",
+  /** Pinned to the toolbar's right edge (wraps to its own line on phones). */
+  clear: appendClass(linkAccent, "ml-auto cursor-pointer"),
 } as const;
 
 export const serviceHistoryStyles = {

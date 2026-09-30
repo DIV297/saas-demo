@@ -38,8 +38,9 @@ export const statCardStyles = {
     base: appendClass(monoText, textMuted),
     default: "max-sm:hidden",
   },
-  body: "mt-auto flex items-end justify-between gap-3",
-  value: appendClass(statValue, "max-sm:text-heading"),
+  /** min-w-0 so a wide value + mini chart never push past the card edge. */
+  body: "mt-auto flex min-w-0 items-end justify-between gap-3",
+  value: appendClass(statValue, "shrink-0 max-sm:text-heading"),
   footnote: {
     base: "text-secondary",
     default: "text-ink-2 max-sm:hidden",
@@ -48,7 +49,8 @@ export const statCardStyles = {
 } as const;
 
 export const revenueBarsStyles = {
-  chart: "flex h-13 w-22 shrink-0 items-end gap-0.5",
+  /** Up to 88px wide; gives way (down to 40px) when the card is narrow so it never overflows. */
+  chart: "flex h-13 w-22 min-w-10 shrink items-end gap-0.5",
   column: "group relative flex h-full flex-1 items-end outline-none",
   tooltip: {
     base: "pointer-events-none absolute bottom-[calc(100%+8px)] z-10 whitespace-nowrap rounded bg-surface px-2 py-1 text-secondary text-ink opacity-0 shadow-pop transition group-hover:opacity-100 group-focus-visible:opacity-100",
